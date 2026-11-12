@@ -111,12 +111,17 @@
   .person .na { color: var(--mute); font-weight: 400; }
   .person svg { flex: none; }
 
+  /* плавающая кнопка к контактам */
+  .to-contact { position: fixed; right: 16px; bottom: 16px; z-index: 10; display: flex; align-items: center; gap: 8px; padding: 13px 20px; border-radius: 999px; background: var(--teal); color: var(--navy); font-weight: 700; text-decoration: none; box-shadow: 0 10px 28px rgba(0,0,0,.5), 0 0 0 4px rgba(95,212,203,.2); transition: opacity .3s, transform .3s, visibility .3s; }
+  .to-contact.off { opacity: 0; transform: translateY(16px); visibility: hidden; }
+  @media (min-width: 860px) { .to-contact { right: 28px; bottom: 28px; } }
+
   footer { padding: 40px 0 56px; border-top: 1px solid var(--line); color: var(--mute); font-size: 14px; }
   footer p + p { margin-top: 10px; }
 
   .reveal { opacity: 0; transform: translateY(24px); transition: opacity .8s ease, transform .8s ease; }
   .reveal.seen { opacity: 1; transform: none; }
-  @media (prefers-reduced-motion: reduce) { .hero::before { animation: none; } .reveal { opacity: 1; transform: none; transition: none; } .meter i { transition: none; } }
+  @media (prefers-reduced-motion: reduce) { .hero::before { animation: none; } .reveal { opacity: 1; transform: none; transition: none; } .meter i { transition: none; } .to-contact { transition: none; } }
 </style>
 </head>
 <body>
@@ -219,6 +224,8 @@
   </div>
 </section>
 
+<a class="to-contact off" href="#contact"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M12 4v15M5 12l7 7 7-7"/></svg>Контакты</a>
+
 <footer>
   <div class="wrap">
     <p>Источники: pravo.by (15.10.2026), neg.by (17.03.2026), primepress.by (18.05.2026), reform.news (14.05.2026); расчёт по открытой отчётности Foshan Electrical and Lighting за 2025 год; сбор китайских соцсетей 08.11.2026; опрос 39 человек.</p>
@@ -248,6 +255,10 @@
   // плавное появление блоков при прокрутке
   const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('seen'); io.unobserve(e.target); } }), { threshold: 0.15 });
   document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+  // кнопка «Контакты» видна, когда на экране нет ни первого экрана (там своя кнопка), ни самих контактов
+  const fab = document.querySelector('.to-contact'), onScreen = new Set();
+  const fio = new IntersectionObserver(es => { es.forEach(e => e.isIntersecting ? onScreen.add(e.target) : onScreen.delete(e.target)); fab.classList.toggle('off', onScreen.size > 0); });
+  [document.querySelector('.hero'), document.getElementById('contact')].forEach(el => fio.observe(el));
 </script>
 </body>
 </html>
